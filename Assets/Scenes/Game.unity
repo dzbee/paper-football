@@ -439,7 +439,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1027677062}
   m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0.025, z: -4.8}
+  m_LocalPosition: {x: 0, y: 0.025, z: -4.9}
   m_LocalScale: {x: 0.5, y: 0.05, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -476,7 +476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   footballBody: {fileID: 1027677067}
   flickDisplacement: 0.45
-  flickForce: 0.5
+  powerSpeed: 1
 --- !u!1 &1664321680
 GameObject:
   m_ObjectHideFlags: 0

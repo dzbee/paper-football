@@ -6,15 +6,20 @@ public class FootballMovement : MonoBehaviour
 {
     public Rigidbody footballBody;
     public float flickDisplacement = 0.45f;
-    public float flickForce = 1f;
-    public float pushForce = 1f;
+    public float powerSpeed = 10f;
+    private float force = 0f;
     private bool onTable = true;
+    private bool isKickoff = true;
+    private Vector3 startPosition;
+    private Quaternion startRotation;
     private Vector3 cornerOffset;
 
     void Start()
     {
         footballBody = GetComponent<Rigidbody>();
-        cornerOffset = transform.position - flickDisplacement * (transform.forward - transform.right);
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+        cornerOffset = startPosition - flickDisplacement * (transform.forward - transform.right);
     }
 
     void OnCollisionStay()
@@ -29,16 +34,26 @@ public class FootballMovement : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetButtonDown("Jump") & onTable) {
+        if(Input.GetButton("Jump") & onTable) {
+            force += powerSpeed * Time.deltaTime;
+        } else if (Input.GetButtonUp("Jump") & isKickoff) {
             onTable = false;
             footballBody.AddForceAtPosition(
-                flickForce * (Vector3.up + Vector3.forward), 
+                force * (Vector3.up + Vector3.forward), 
                 transform.position + cornerOffset, 
                 ForceMode.Impulse
             );
+            force = 0f;
+            isKickoff = false;
+        } else if (Input.GetButtonUp("Jump") & !isKickoff) {
+            footballBody.AddForce(force * Vector3.forward, ForceMode.Impulse);
+            force = 0f;
         }
-        else if(Input.GetButtonDown("Submit") & onTable) {
-            footballBody.AddForce(pushForce * Vector3.forward, ForceMode.Impulse);
+
+        if(transform.position.y < -1f){
+            transform.position = startPosition;
+            transform.rotation = startRotation;
+            isKickoff = true;
         }
     }
 }
