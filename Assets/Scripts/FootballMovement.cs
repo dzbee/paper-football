@@ -9,10 +9,14 @@ public class FootballMovement : MonoBehaviour
     public float powerSpeed = 10f;
     private float force = 0f;
     private bool onTable = true;
+    public bool inPlay = true;
     private bool isKickoff = true;
     private Vector3 startPosition;
     private Quaternion startRotation;
     private Vector3 cornerOffset;
+    private int playerCount = 0;
+    private int opponentCount = 0;
+    private bool playerDrive = true;
 
     void Start()
     {
@@ -32,12 +36,34 @@ public class FootballMovement : MonoBehaviour
         onTable = false;
     }
 
+    void OnTriggerStay(Collider other)
+    {
+        if(footballBody.IsSleeping() && inPlay){
+            inPlay = false;
+            if(playerDrive && other.CompareTag("OppoEnd")){
+                playerCount++;
+                Debug.Log("Player score: " + playerCount);
+                StartCoroutine(reset());
+            } else if(!playerDrive && other.CompareTag("PlayerEnd")){
+                opponentCount++;
+                Debug.Log("Oppo score: " + opponentCount);
+                StartCoroutine(reset());
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other) {
+        if(other.gameObject.CompareTag("PlayerEnd") | other.gameObject.CompareTag("OppoEnd")){
+            inPlay = true;
+        }
+    }
+
+
     void Update()
     {
         if(Input.GetButton("Jump") & onTable) {
             force += powerSpeed * Time.deltaTime;
         } else if (Input.GetButtonUp("Jump") & isKickoff) {
-            onTable = false;
             footballBody.AddForceAtPosition(
                 force * (Vector3.up + Vector3.forward), 
                 transform.position + cornerOffset, 
@@ -50,10 +76,15 @@ public class FootballMovement : MonoBehaviour
             force = 0f;
         }
 
-        if(transform.position.y < -1f){
-            transform.position = startPosition;
-            transform.rotation = startRotation;
-            isKickoff = true;
+        if(transform.position.y < 0f){
+            StartCoroutine(reset());
         }
+    }
+
+    IEnumerator reset() {
+        yield return new WaitForSeconds(0.5f);
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+        isKickoff = true;
     }
 }
