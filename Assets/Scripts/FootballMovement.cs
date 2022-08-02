@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class FootballMovement : MonoBehaviour
 {
     public Rigidbody footballBody;
+    public TextMeshProUGUI scoreboard;
     public float flickDisplacement = 0.45f;
     public float powerSpeed = 10f;
     private float force = 0f;
     private bool onTable = true;
-    public bool inPlay = true;
+    private bool inPlay = true;
     private bool isKickoff = true;
     private Vector3 startPosition;
     private Quaternion startRotation;
@@ -36,17 +38,22 @@ public class FootballMovement : MonoBehaviour
         onTable = false;
     }
 
+    void SetScore()
+    {
+        scoreboard.text = "Player: " + (6 * playerCount).ToString() + "\nOpponent: " + (6 * opponentCount).ToString();
+    }
+
     void OnTriggerStay(Collider other)
     {
         if(footballBody.IsSleeping() && inPlay){
             inPlay = false;
             if(playerDrive && other.CompareTag("OppoEnd")){
                 playerCount++;
-                Debug.Log("Player score: " + playerCount);
+                SetScore();
                 StartCoroutine(reset());
             } else if(!playerDrive && other.CompareTag("PlayerEnd")){
                 opponentCount++;
-                Debug.Log("Oppo score: " + opponentCount);
+                SetScore();
                 StartCoroutine(reset());
             }
         }
