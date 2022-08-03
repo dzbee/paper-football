@@ -9,6 +9,7 @@ public class Referee : MonoBehaviour
     public FootballMovement movement;
     private Rigidbody footballBody;
     public TextMeshProUGUI scoreboard;
+    public int nPlayers = 1;
     public enum PlayState{
         Playing,
         Waiting,
@@ -18,6 +19,7 @@ public class Referee : MonoBehaviour
         public enum Player{
         Player1,
         Player2,
+        Computer,
     }
     private Player turn = Player.Player1;
     private int playerScore, opponentScore = 0;
@@ -32,13 +34,14 @@ public class Referee : MonoBehaviour
     }
 
     public void ChangeTurn(){
-        switch (turn) {
-            case Player.Player1:
+        if (turn == Player.Player1){
+            if(nPlayers == 2){
                 turn = Player.Player2;
-                break;
-            case Player.Player2:
-                turn = Player.Player1;
-                break;
+            } else {
+                turn = Player.Computer;
+            }
+        } else {
+            turn = Player.Player1;
         }
     }
 
@@ -71,13 +74,10 @@ public class Referee : MonoBehaviour
     }
 
     public void Touchdown(Player player){
-        switch (player) {
-            case Player.Player1:
-                playerScore += 6;
-                break;
-            case Player.Player2:
-                opponentScore += 6;
-                break;
+        if (player == Player.Player1) {
+            playerScore += 6;
+        } else {
+            opponentScore += 6;
         }
         SetScore();
         StartCoroutine(movement.SetupKickoff(player));
@@ -85,7 +85,7 @@ public class Referee : MonoBehaviour
 
     void SetScore()
     {
-        scoreboard.text = "Player: " + playerScore.ToString() + "\nOpponent: " + opponentScore.ToString();
+        scoreboard.text = "Player 1: " + playerScore.ToString() + "\nPlayer 2: " + opponentScore.ToString();
     }
 
     void Start(){

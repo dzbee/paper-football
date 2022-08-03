@@ -16,16 +16,14 @@ public class FootballMovement : MonoBehaviour
     private Quaternion startRotation;
     private Vector3 cornerOffset;
     public IEnumerator waitRoutine;
+    private float waitTime;
 
     public IEnumerator SetupKickoff(Referee.Player player) {
         yield return new WaitForSeconds(1);
-        switch (player) {
-            case Referee.Player.Player1:
-                transform.position = playerKickoffPosition;
-                break;
-            case Referee.Player.Player2:
-                transform.position = opponentKickoffPosition;
-                break;
+        if(player == Referee.Player.Player1){
+            transform.position = playerKickoffPosition;
+        } else {
+            transform.position = opponentKickoffPosition;
         }
         transform.rotation = startRotation;
         footballBody.velocity = Vector3.zero;
@@ -44,10 +42,13 @@ public class FootballMovement : MonoBehaviour
             case Referee.Player.Player2:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
+                break;                
+            case Referee.Player.Computer:
+                position = transform.position - cornerOffset;
+                direction = Vector3.up + Vector3.back;
                 force = 0.45f;
                 break;
         }
-        Debug.Log("kick! force: " + force + "direction: " + direction + "position: " + position);
         footballBody.AddForceAtPosition(
                 force * direction,
                 position,
@@ -65,16 +66,17 @@ public class FootballMovement : MonoBehaviour
                 break;
             case Referee.Player.Player2:
                 direction = Vector3.back;
+                break;
+            case Referee.Player.Computer:
+                direction = Vector3.back;
                 force = 1f;
                 break;
         }
-        Debug.Log("push! force: " + force + "direction: " + direction);
         footballBody.AddForce(force * direction, ForceMode.Impulse);
         force = 0f;
     }
 
     void Play(Referee.Player player){
-        Debug.Log("deciding play");
         if(referee.Kickable(player)){
             Kick(player);
         } else if(referee.Pushable(player)){
@@ -97,28 +99,34 @@ public class FootballMovement : MonoBehaviour
         );
         startRotation = transform.rotation;
         cornerOffset = transform.position - flickDisplacement * (transform.forward - transform.right);
+        if (referee.nPlayers == 2){
+            waitTime = 0;
+        } else {
+            waitTime = 1;
+        }
     }
 
     void Update()
     {
-        if(Input.GetButton("Jump") & referee.Playable(Referee.Player.Player1)) {
+        if(Input.GetButton("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2))) {
             force += powerSpeed * Time.deltaTime;
-        } else if (Input.GetButtonUp("Jump") & referee.Playable(Referee.Player.Player1)){
-            Debug.Log("executing player turn");
+        } else if (Input.GetButtonUp("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2))){
+            if (referee.Playable(Referee.Player.Player1)) {
+                Play(Referee.Player.Player1);
+            } else {
+                Play(Referee.Player.Player2);
+            }
             referee.SetPlayState(Referee.PlayState.Waiting);
-            Play(Referee.Player.Player1);
-            Debug.Log("waiting for play to end");
             if (waitRoutine != null) {
                 StopCoroutine(waitRoutine);
             }
-            waitRoutine = PlayEndAndWait(1);
+            waitRoutine = PlayEndAndWait(waitTime);
             StartCoroutine(waitRoutine);
         }
 
-        if(referee.Playable(Referee.Player.Player2)){
-            Debug.Log("executing opponent turn");
+        if(referee.Playable(Referee.Player.Computer)){
             referee.SetPlayState(Referee.PlayState.Waiting);
-            Play(Referee.Player.Player2);
+            Play(Referee.Player.Computer);
             if (waitRoutine != null) {
                 StopCoroutine(waitRoutine);
             }
@@ -127,39 +135,31 @@ public class FootballMovement : MonoBehaviour
         }
 
         if(referee.OutOfBounds() & referee.InPlay()){
-            Debug.Log("stopping play for OOB");
             referee.SetPlayState(Referee.PlayState.Stopped);
-            Debug.Log("halting wait coroutine");
             StopCoroutine(waitRoutine);
-            Debug.Log("setting up kickoff");
             StartCoroutine(SetupKickoff(referee.PlayerTurn()));
         }
     }
 
     bool ScoringPosition(Collider other, Referee.Player player){
-        return (other.CompareTag("PlayerEnd") & player == Referee.Player.Player2) |
+        return (other.CompareTag("PlayerEnd") & (player == Referee.Player.Player2 | player == Referee.Player.Computer)) |
                (other.CompareTag("OppoEnd") & player == Referee.Player.Player1);
     }
 
     void OnTriggerStay(Collider other){
-        var player = referee.PlayerTurn();
-        if(ScoringPosition(other, player) & referee.InPlay()){
-            Debug.Log("ball in endzone");
+        if(ScoringPosition(other, referee.PlayerTurn()) & referee.InPlay()){
             StopCoroutine(waitRoutine);
         }
-        if(ScoringPosition(other, player) & referee.Scoreable()){
-            Debug.Log("touchdown, stopping play");
+        if(ScoringPosition(other, referee.PlayerTurn()) & referee.Scoreable()){
             referee.SetPlayState(Referee.PlayState.Stopped);
-            referee.Touchdown(player);
+            referee.Touchdown(referee.PlayerTurn());
         }
     }
 
     IEnumerator PlayEndAndWait(float seconds){
         yield return new WaitUntil(footballBody.IsSleeping);
         yield return new WaitForSeconds(seconds);
-        Debug.Log("changing turns");
         referee.ChangeTurn();
-        Debug.Log("playing");
         referee.SetPlayState(Referee.PlayState.Playing);
     }
 }
