@@ -71,7 +71,9 @@ public class FootballMovement : MonoBehaviour
             case Referee.Player.Computer:
                 direction = Vector3.back;
                 var target = new Vector3(transform.position.x, 0, playerEndzone.transform.position.z);
-                force = Random.Range(0.6f, 1.4f) * moveCalculator.Force(target);
+                var upperLimit = 1.2f + 0.15f * Mathf.Abs((playerEndzone.transform.position.z - transform.position.z) / 
+                (opponentEndzone.transform.position.z - playerEndzone.transform.position.z));
+                force = Random.Range(0.6f, upperLimit) * moveCalculator.Force(target);
                 break;
         }
         footballBody.AddForce(force * direction.normalized, ForceMode.Impulse);
