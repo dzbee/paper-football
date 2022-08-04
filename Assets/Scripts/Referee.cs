@@ -10,17 +10,10 @@ public class Referee : MonoBehaviour
     private Rigidbody footballBody;
     public TextMeshProUGUI scoreboard;
     public int nPlayers = 1;
-    public enum PlayState{
-        Playing,
-        Waiting,
-        Stopped
-    }
+    public string playerName, opponentName;
+    public enum PlayState{Playing, Waiting, Stopped};
     private PlayState playState = PlayState.Playing;
-        public enum Player{
-        Player1,
-        Player2,
-        Computer,
-    }
+    public enum Player{Player1, Player2, Computer};
     private Player turn = Player.Player1;
     private int playerScore, opponentScore = 0;
     private bool kickoff = true;
@@ -85,10 +78,11 @@ public class Referee : MonoBehaviour
 
     void SetScore()
     {
-        scoreboard.text = "Player 1: " + playerScore.ToString() + "\nPlayer 2: " + opponentScore.ToString();
+        scoreboard.text = $"{playerName}: {playerScore}\n{opponentName}: {opponentScore}";
     }
 
     void Start(){
         footballBody = football.GetComponent<Rigidbody>();
+        SetScore();
     }
 }
