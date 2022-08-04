@@ -6,6 +6,7 @@ public class FootballMovement : MonoBehaviour
 {
     public Rigidbody footballBody;
     public Referee referee;
+    public MoveCalculator moveCalculator;
     public GameObject playerEndzone;
     public GameObject opponentEndzone;
     public float flickDisplacement = 0.45f;
@@ -46,11 +47,11 @@ public class FootballMovement : MonoBehaviour
             case Referee.Player.Computer:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
-                force = 0.45f;
+                force = Random.Range(0.5f, 0.95f);
                 break;
         }
         footballBody.AddForceAtPosition(
-                force * direction,
+                force * direction.normalized,
                 position,
                 ForceMode.Impulse
             );
@@ -69,10 +70,11 @@ public class FootballMovement : MonoBehaviour
                 break;
             case Referee.Player.Computer:
                 direction = Vector3.back;
-                force = 1f;
+                var target = new Vector3(transform.position.x, 0, playerEndzone.transform.position.z);
+                force = Random.Range(0.6f, 1.4f) * moveCalculator.Force(target);
                 break;
         }
-        footballBody.AddForce(force * direction, ForceMode.Impulse);
+        footballBody.AddForce(force * direction.normalized, ForceMode.Impulse);
         force = 0f;
     }
 
