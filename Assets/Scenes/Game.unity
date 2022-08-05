@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 210197208}
   m_Layer: 0
   m_Name: PlayerFG
-  m_TagString: PlayerEnd
+  m_TagString: PlayerFG
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 126
@@ -280,7 +280,7 @@ GameObject:
   - component: {fileID: 534723704}
   m_Layer: 0
   m_Name: OpponentFG
-  m_TagString: OppoEnd
+  m_TagString: OppoFG
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 126
@@ -669,7 +669,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1027677062}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: f0127e00532b15e4686bdef2ad334138, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -768,12 +768,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4ed488fea803824ebc0b89ffeb5c74a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  footballBody: {fileID: 1027677067}
   referee: {fileID: 1822030577}
   moveCalculator: {fileID: 179149721}
   playerEndzone: {fileID: 709092082}
   opponentEndzone: {fileID: 1293204046}
-  flickDisplacement: 0.45
+  playerFG: {fileID: 210197206}
+  opponentFG: {fileID: 534723702}
+  footballFG: {fileID: 1326707093}
   powerSpeed: 1
 --- !u!1 &1293204046
 GameObject:
@@ -829,6 +830,137 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1293204046}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1326707093
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1326707099}
+  - component: {fileID: 1326707098}
+  - component: {fileID: 1326707097}
+  - component: {fileID: 1326707096}
+  - component: {fileID: 1326707095}
+  - component: {fileID: 1326707100}
+  m_Layer: 0
+  m_Name: FGFootball
+  m_TagString: Football
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!54 &1326707095
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  serializedVersion: 2
+  m_Mass: 0.1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
+--- !u!65 &1326707096
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  m_Material: {fileID: 13400000, guid: f0127e00532b15e4686bdef2ad334138, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1326707097
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 71147024039a2424da8a2206fdec23e7, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1326707098
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1326707099
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  m_LocalRotation: {x: 0.6532815, y: 0.27059805, z: 0.27059805, w: 0.6532815}
+  m_LocalPosition: {x: 0, y: 0.353555, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.05, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 45, y: 90, z: 90}
+--- !u!114 &1326707100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326707093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f10b16d1678f6794387aa94d88bb09f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  referee: {fileID: 1822030577}
+  primaryFootball: {fileID: 1027677068}
+  powerSpeed: 1
+  flickDisplacement: 0.45
 --- !u!1 &1495102109
 GameObject:
   m_ObjectHideFlags: 0
@@ -1195,6 +1327,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   football: {fileID: 1027677062}
+  footballFG: {fileID: 1326707093}
+  playerFG: {fileID: 210197206}
+  oppoFG: {fileID: 534723702}
   movement: {fileID: 1027677068}
   scoreboard: {fileID: 1495102111}
   nPlayers: 1
@@ -1378,7 +1513,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2118545818}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 54f95b63b0cac144ababc50fa66b1ff6, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

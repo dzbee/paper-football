@@ -30,6 +30,18 @@ public class FootballMovement : MonoBehaviour
         referee.SetPlayState(Referee.PlayState.Playing);
     }
 
+    public IEnumerator SetupFG(Referee.Player player) {
+        yield return new WaitForSeconds(1);
+        gameObject.SetActive(false);
+        if (player == Referee.Player.Player1) {
+            opponentFG.SetActive(true);
+        } else {
+            playerFG.SetActive(true);
+        }
+        footballFG.SetActive(true);
+        footballFG.GetComponent<Rigidbody>().Sleep();
+    }
+
     void Kick(Referee.Player player){
         var position = Vector3.zero;
         var direction = Vector3.zero;
