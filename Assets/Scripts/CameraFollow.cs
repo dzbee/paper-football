@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public GameObject football;
+    public GameObject football, footballFG;
     private Vector3 offset;
+    private bool followFG = false;
 
     void Start()
     {
@@ -14,6 +15,14 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
-        transform.position = football.transform.position + offset;
+        if (followFG) {
+            transform.position = footballFG.transform.position + offset;
+        } else {
+            transform.position = football.transform.position + offset;
+        }
+    }
+
+    public void Switch(){
+        followFG = !followFG;
     }
 }

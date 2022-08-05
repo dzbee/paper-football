@@ -6,6 +6,7 @@ public class FootballMovement : MonoBehaviour
 {
     private Rigidbody footballBody;
     public Referee referee;
+    public CameraFollow cameraFollow;
     public MoveCalculator moveCalculator;
     public GameObject playerEndzone, opponentEndzone, playerFG, opponentFG, footballFG;
     private float flickDisplacement = 0.45f;
@@ -38,6 +39,7 @@ public class FootballMovement : MonoBehaviour
         } else {
             playerFG.SetActive(true);
         }
+        cameraFollow.Switch();
         footballFG.SetActive(true);
         footballFG.GetComponent<Rigidbody>().Sleep();
     }

@@ -7,6 +7,7 @@ public class Referee : MonoBehaviour
 {
     public GameObject football, footballFG, playerFG, oppoFG;
     public FootballMovement movement;
+    public CameraFollow cameraFollow;
     private Rigidbody footballBody;
     public TextMeshProUGUI scoreboard;
     public int nPlayers = 1;
@@ -91,6 +92,7 @@ public class Referee : MonoBehaviour
         playerFG.SetActive(false);
         oppoFG.SetActive(false);
         footballFG.SetActive(false);
+        cameraFollow.Switch();
         football.SetActive(true);
     }
 

@@ -769,6 +769,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   referee: {fileID: 1822030577}
+  cameraFollow: {fileID: 1664321684}
   moveCalculator: {fileID: 179149721}
   playerEndzone: {fileID: 709092082}
   opponentEndzone: {fileID: 1293204046}
@@ -1297,6 +1298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   football: {fileID: 1027677062}
+  footballFG: {fileID: 1326707093}
 --- !u!1 &1822030576
 GameObject:
   m_ObjectHideFlags: 0
@@ -1331,6 +1333,7 @@ MonoBehaviour:
   playerFG: {fileID: 210197206}
   oppoFG: {fileID: 534723702}
   movement: {fileID: 1027677068}
+  cameraFollow: {fileID: 1664321684}
   scoreboard: {fileID: 1495102111}
   nPlayers: 1
   playerName: Dylan
