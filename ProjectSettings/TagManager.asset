@@ -6,6 +6,9 @@ TagManager:
   tags:
   - PlayerEnd
   - OppoEnd
+  - Football
+  - PlayerFG
+  - OppoFG
   layers:
   - Default
   - TransparentFX

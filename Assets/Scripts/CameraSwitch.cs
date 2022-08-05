@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class CameraSwitch : MonoBehaviour
 {
-    public GameObject overheadCamera;
-    public GameObject tableCamera;
+    public GameObject overheadCamera, tableCamera;
     
     void Start() {
         overheadCamera.SetActive(true);

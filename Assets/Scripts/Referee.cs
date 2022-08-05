@@ -5,8 +5,9 @@ using TMPro;
 
 public class Referee : MonoBehaviour
 {
-    public GameObject football;
+    public GameObject football, footballFG, playerFG, oppoFG;
     public FootballMovement movement;
+    public CameraFollow cameraFollow;
     private Rigidbody footballBody;
     public TextMeshProUGUI scoreboard;
     public int nPlayers = 1;
@@ -73,7 +74,26 @@ public class Referee : MonoBehaviour
             opponentScore += 6;
         }
         SetScore();
-        StartCoroutine(movement.SetupKickoff(player));
+        StartCoroutine(movement.SetupFG(player));
+    }
+
+    public void ExtraPoint(Player player){
+        if (player == Player.Player1) {
+            playerScore += 1;
+        } else {
+            opponentScore += 1;
+        }
+        SetScore();
+    }
+
+    public IEnumerator ResetPlay(){
+        StartCoroutine(movement.SetupKickoff(turn));
+        yield return new WaitForSeconds(1);
+        playerFG.SetActive(false);
+        oppoFG.SetActive(false);
+        footballFG.SetActive(false);
+        cameraFollow.Switch();
+        football.SetActive(true);
     }
 
     void SetScore()

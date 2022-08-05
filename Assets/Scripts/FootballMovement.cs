@@ -4,17 +4,16 @@ using UnityEngine;
 
 public class FootballMovement : MonoBehaviour
 {
-    public Rigidbody footballBody;
+    private Rigidbody footballBody;
     public Referee referee;
+    public CameraFollow cameraFollow;
     public MoveCalculator moveCalculator;
-    public GameObject playerEndzone;
-    public GameObject opponentEndzone;
-    public float flickDisplacement = 0.45f;
-    public float powerSpeed = 10f;
+    public GameObject playerEndzone, opponentEndzone, playerFG, opponentFG, footballFG;
+    private float flickDisplacement = 0.45f;
+    public float powerSpeed = 1f;
     private float force = 0f;
-    private Vector3 playerKickoffPosition;
-    private Vector3 opponentKickoffPosition;
-    private Quaternion startRotation;
+    private Vector3 playerKickoffPosition, opponentKickoffPosition;
+    private Quaternion kickoffRotation;
     private Vector3 cornerOffset;
     public IEnumerator waitRoutine;
     private float waitTime;
@@ -26,10 +25,23 @@ public class FootballMovement : MonoBehaviour
         } else {
             transform.position = opponentKickoffPosition;
         }
-        transform.rotation = startRotation;
+        transform.rotation = kickoffRotation;
         footballBody.velocity = Vector3.zero;
         referee.ReadyForKickoff(true);
         referee.SetPlayState(Referee.PlayState.Playing);
+    }
+
+    public IEnumerator SetupFG(Referee.Player player) {
+        yield return new WaitForSeconds(1);
+        gameObject.SetActive(false);
+        if (player == Referee.Player.Player1) {
+            opponentFG.SetActive(true);
+        } else {
+            playerFG.SetActive(true);
+        }
+        cameraFollow.Switch();
+        footballFG.SetActive(true);
+        footballFG.GetComponent<Rigidbody>().Sleep();
     }
 
     void Kick(Referee.Player player){
@@ -101,7 +113,7 @@ public class FootballMovement : MonoBehaviour
             transform.position.y,
             opponentEndzone.transform.position.z * .98f
         );
-        startRotation = transform.rotation;
+        kickoffRotation = transform.rotation;
         cornerOffset = transform.position - flickDisplacement * (transform.forward - transform.right);
         if (referee.nPlayers == 2){
             waitTime = 0;
