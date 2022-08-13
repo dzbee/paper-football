@@ -6,12 +6,15 @@ using TMPro;
 public class Referee : MonoBehaviour
 {
     public GameObject football, footballFG, playerFG, oppoFG;
+    [SerializeField] GameObject gameOverPanel;
     public FootballMovement movement;
     public CameraFollow cameraFollow;
     private Rigidbody footballBody;
-    public TextMeshProUGUI scoreboard;
+    [SerializeField] TextMeshProUGUI scoreboard, gameClock;
     public int nPlayers = 1;
     public string player1Name, player2Name;
+    [SerializeField] DataManager.GameMode gameMode;
+    [SerializeField] int gameTime, gamePoints;
     public enum PlayState{Playing, Waiting, Stopped};
     private PlayState playState = PlayState.Playing;
     public enum Player{Player1, Player2, Computer};
@@ -98,7 +101,40 @@ public class Referee : MonoBehaviour
 
     void SetScore()
     {
+        // Check for end of game if points game mode
+        if (gameMode == DataManager.GameMode.Points) {
+            if (player1Score >= gamePoints | player2Score >= gamePoints) {
+                GameOver();
+            }
+        }
         scoreboard.text = $"{player1Name}: {player1Score}\n{player2Name}: {player2Score}";
+    }
+
+    void SetTime() {
+        int minutes = gameTime / 60;
+        int remainderSeconds = gameTime % 60;
+        if (remainderSeconds >= 10) {
+            gameClock.text = $"Time: {minutes}:{remainderSeconds}";
+        } else {
+            gameClock.text = $"Time: {minutes}:0{remainderSeconds}";
+        }
+    }
+
+    void GameOver() {
+        playState = PlayState.Stopped;
+        gameOverPanel.SetActive(true);
+        StopAllCoroutines();
+        Time.timeScale = 0;
+    }
+
+    IEnumerator CountTime() {
+        yield return new WaitForSeconds(1);
+        gameTime--;
+        SetTime();
+        if (gameTime <= 0) {
+            GameOver();
+        }
+        StartCoroutine(CountTime());
     }
 
     void Start(){
@@ -110,8 +146,16 @@ public class Referee : MonoBehaviour
             } else {
                 player2Name = "Computer";
             }
+            gameMode = DataManager.Instance.gameMode;
+            gamePoints = DataManager.Instance.gamePoints;
+            gameTime = DataManager.Instance.gameTime;
         }
         footballBody = football.GetComponent<Rigidbody>();
         SetScore();
+        if (gameMode == DataManager.GameMode.Time) {
+            SetTime();
+            gameClock.gameObject.SetActive(true);
+            StartCoroutine(CountTime());
+        }
     }
 }
