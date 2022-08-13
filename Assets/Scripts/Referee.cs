@@ -11,12 +11,12 @@ public class Referee : MonoBehaviour
     private Rigidbody footballBody;
     public TextMeshProUGUI scoreboard;
     public int nPlayers = 1;
-    public string playerName, opponentName;
+    public string player1Name, player2Name;
     public enum PlayState{Playing, Waiting, Stopped};
     private PlayState playState = PlayState.Playing;
     public enum Player{Player1, Player2, Computer};
     private Player turn = Player.Player1;
-    private int playerScore, opponentScore = 0;
+    private int player1Score, player2Score = 0;
     private bool kickoff = true;
     
     public void SetPlayState(PlayState state) {
@@ -69,9 +69,9 @@ public class Referee : MonoBehaviour
 
     public void Touchdown(Player player){
         if (player == Player.Player1) {
-            playerScore += 6;
+            player1Score += 6;
         } else {
-            opponentScore += 6;
+            player2Score += 6;
         }
         SetScore();
         StartCoroutine(movement.SetupFG(player));
@@ -79,9 +79,9 @@ public class Referee : MonoBehaviour
 
     public void ExtraPoint(Player player){
         if (player == Player.Player1) {
-            playerScore += 1;
+            player1Score += 1;
         } else {
-            opponentScore += 1;
+            player2Score += 1;
         }
         SetScore();
     }
@@ -98,10 +98,19 @@ public class Referee : MonoBehaviour
 
     void SetScore()
     {
-        scoreboard.text = $"{playerName}: {playerScore}\n{opponentName}: {opponentScore}";
+        scoreboard.text = $"{player1Name}: {player1Score}\n{player2Name}: {player2Score}";
     }
 
     void Start(){
+        if (DataManager.Instance != null) {
+            nPlayers = DataManager.Instance.nPlayers;
+            player1Name = DataManager.Instance.player1Name;
+            if (nPlayers > 1) {
+                player2Name = DataManager.Instance.player2Name;
+            } else {
+                player2Name = "Computer";
+            }
+        }
         footballBody = football.GetComponent<Rigidbody>();
         SetScore();
     }
