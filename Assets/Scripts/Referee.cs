@@ -6,17 +6,20 @@ using TMPro;
 public class Referee : MonoBehaviour
 {
     public GameObject football, footballFG, playerFG, oppoFG;
+    [SerializeField] GameObject gameOverPanel;
     public FootballMovement movement;
     public CameraFollow cameraFollow;
     private Rigidbody footballBody;
-    public TextMeshProUGUI scoreboard;
+    [SerializeField] TextMeshProUGUI scoreboard, gameClock;
     public int nPlayers = 1;
-    public string playerName, opponentName;
+    public string player1Name, player2Name;
+    [SerializeField] DataManager.GameMode gameMode;
+    [SerializeField] int gameTime, gamePoints;
     public enum PlayState{Playing, Waiting, Stopped};
     private PlayState playState = PlayState.Playing;
     public enum Player{Player1, Player2, Computer};
     private Player turn = Player.Player1;
-    private int playerScore, opponentScore = 0;
+    private int player1Score, player2Score = 0;
     private bool kickoff = true;
     
     public void SetPlayState(PlayState state) {
@@ -69,9 +72,9 @@ public class Referee : MonoBehaviour
 
     public void Touchdown(Player player){
         if (player == Player.Player1) {
-            playerScore += 6;
+            player1Score += 6;
         } else {
-            opponentScore += 6;
+            player2Score += 6;
         }
         SetScore();
         StartCoroutine(movement.SetupFG(player));
@@ -79,9 +82,9 @@ public class Referee : MonoBehaviour
 
     public void ExtraPoint(Player player){
         if (player == Player.Player1) {
-            playerScore += 1;
+            player1Score += 1;
         } else {
-            opponentScore += 1;
+            player2Score += 1;
         }
         SetScore();
     }
@@ -98,11 +101,61 @@ public class Referee : MonoBehaviour
 
     void SetScore()
     {
-        scoreboard.text = $"{playerName}: {playerScore}\n{opponentName}: {opponentScore}";
+        // Check for end of game if points game mode
+        if (gameMode == DataManager.GameMode.Points) {
+            if (player1Score >= gamePoints | player2Score >= gamePoints) {
+                GameOver();
+            }
+        }
+        scoreboard.text = $"{player1Name}: {player1Score}\n{player2Name}: {player2Score}";
+    }
+
+    void SetTime() {
+        int minutes = gameTime / 60;
+        int remainderSeconds = gameTime % 60;
+        if (remainderSeconds >= 10) {
+            gameClock.text = $"Time: {minutes}:{remainderSeconds}";
+        } else {
+            gameClock.text = $"Time: {minutes}:0{remainderSeconds}";
+        }
+    }
+
+    void GameOver() {
+        playState = PlayState.Stopped;
+        gameOverPanel.SetActive(true);
+        StopAllCoroutines();
+        Time.timeScale = 0;
+    }
+
+    IEnumerator CountTime() {
+        yield return new WaitForSeconds(1);
+        gameTime--;
+        SetTime();
+        if (gameTime <= 0) {
+            GameOver();
+        }
+        StartCoroutine(CountTime());
     }
 
     void Start(){
+        if (DataManager.Instance != null) {
+            nPlayers = DataManager.Instance.nPlayers;
+            player1Name = DataManager.Instance.player1Name;
+            if (nPlayers > 1) {
+                player2Name = DataManager.Instance.player2Name;
+            } else {
+                player2Name = "Computer";
+            }
+            gameMode = DataManager.Instance.gameMode;
+            gamePoints = DataManager.Instance.gamePoints;
+            gameTime = DataManager.Instance.gameTime;
+        }
         footballBody = football.GetComponent<Rigidbody>();
         SetScore();
+        if (gameMode == DataManager.GameMode.Time) {
+            SetTime();
+            gameClock.gameObject.SetActive(true);
+            StartCoroutine(CountTime());
+        }
     }
 }
