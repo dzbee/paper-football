@@ -63,9 +63,6 @@ public class FootballMovement : MonoBehaviour
                 force = Random.Range(0.5f, 0.95f);
                 break;
         }
-        Debug.Log($"kick player: {player}");
-        Debug.Log($"kick position: {position}");
-        Debug.Log($"kick direction: {direction}");
         footballBody.AddForceAtPosition(
                 force * direction.normalized,
                 position,
