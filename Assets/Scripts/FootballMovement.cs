@@ -22,10 +22,11 @@ public class FootballMovement : MonoBehaviour
         yield return new WaitForSeconds(1);
         if(player == Referee.Player.Player1){
             transform.position = playerKickoffPosition;
+            transform.rotation = kickoffRotation;
         } else {
             transform.position = opponentKickoffPosition;
+            transform.rotation = kickoffRotation * Quaternion.Euler(0, 0, 180);
         }
-        transform.rotation = kickoffRotation;
         footballBody.velocity = Vector3.zero;
         referee.ReadyForKickoff(true);
         referee.SetPlayState(Referee.PlayState.Playing);
@@ -62,6 +63,9 @@ public class FootballMovement : MonoBehaviour
                 force = Random.Range(0.5f, 0.95f);
                 break;
         }
+        Debug.Log($"kick player: {player}");
+        Debug.Log($"kick position: {position}");
+        Debug.Log($"kick direction: {direction}");
         footballBody.AddForceAtPosition(
                 force * direction.normalized,
                 position,
@@ -106,20 +110,21 @@ public class FootballMovement : MonoBehaviour
         playerKickoffPosition = new Vector3(
             playerEndzone.transform.position.x,
             transform.position.y,
-            playerEndzone.transform.position.z * .98f
+            playerEndzone.transform.position.z
         );
         opponentKickoffPosition = new Vector3(
             opponentEndzone.transform.position.x,
             transform.position.y,
-            opponentEndzone.transform.position.z * .98f
+            opponentEndzone.transform.position.z
         );
         kickoffRotation = transform.rotation;
-        cornerOffset = transform.position - flickDisplacement * (transform.forward - transform.right);
+        cornerOffset = transform.position + flickDisplacement * (transform.up.normalized);
         if (referee.nPlayers == 2){
             waitTime = 0;
         } else {
             waitTime = 1;
         }
+        transform.position = playerKickoffPosition;
     }
 
     void Update()
