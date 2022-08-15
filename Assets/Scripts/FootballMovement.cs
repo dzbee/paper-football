@@ -4,45 +4,28 @@ using UnityEngine;
 
 public class FootballMovement : MonoBehaviour
 {
-    private Rigidbody footballBody;
-    public Referee referee;
-    public CameraFollow cameraFollow;
-    public MoveCalculator moveCalculator;
-    public GameObject playerEndzone, opponentEndzone, playerFG, opponentFG, footballFG;
-    private float flickDisplacement = 0.45f;
+    Rigidbody footballBody;
+    [SerializeField] Referee referee;
+    [SerializeField] MoveCalculator moveCalculator;
+    [SerializeField] GameObject player1Zone, player2Zone;
+    float flickDisplacement = 0.45f;
     public float powerSpeed = 1f;
-    private float force = 0f;
-    private Vector3 playerKickoffPosition, opponentKickoffPosition;
-    private Quaternion kickoffRotation;
-    private Vector3 cornerOffset;
-    public IEnumerator waitRoutine;
-    private float waitTime;
+    float force = 0f;
+    Vector3 player1KickoffPosition, player2KickoffPosition;
+    Quaternion kickoffRotation;
+    Vector3 cornerOffset;
+    public bool scoringPosition;
 
-    public IEnumerator SetupKickoff(Referee.Player player) {
-        yield return new WaitForSeconds(1);
+    public void SetupKickoff(Referee.Player player) {
         if(player == Referee.Player.Player1){
-            transform.position = playerKickoffPosition;
+            transform.position = player1KickoffPosition;
             transform.rotation = kickoffRotation;
         } else {
-            transform.position = opponentKickoffPosition;
+            transform.position = player2KickoffPosition;
             transform.rotation = kickoffRotation * Quaternion.Euler(0, 0, 180);
         }
-        footballBody.velocity = Vector3.zero;
-        referee.ReadyForKickoff(true);
-        referee.SetPlayState(Referee.PlayState.Playing);
-    }
-
-    public IEnumerator SetupFG(Referee.Player player) {
-        yield return new WaitForSeconds(1);
-        gameObject.SetActive(false);
-        if (player == Referee.Player.Player1) {
-            opponentFG.SetActive(true);
-        } else {
-            playerFG.SetActive(true);
-        }
-        cameraFollow.Switch();
-        footballFG.SetActive(true);
-        footballFG.GetComponent<Rigidbody>().Sleep();
+        footballBody.Sleep();
+        referee.ReadyForKickoff();
     }
 
     void Kick(Referee.Player player){
@@ -69,10 +52,9 @@ public class FootballMovement : MonoBehaviour
                 ForceMode.Impulse
             );
         force = 0f;
-        referee.ReadyForKickoff(false);
     }
 
-    void Push(Referee.Player player){
+    void Drive(Referee.Player player){
         var direction = Vector3.zero;
         switch (player) {
             case Referee.Player.Player1:
@@ -83,9 +65,9 @@ public class FootballMovement : MonoBehaviour
                 break;
             case Referee.Player.Computer:
                 direction = Vector3.back;
-                var target = new Vector3(transform.position.x, 0, playerEndzone.transform.position.z);
-                var upperLimit = 1.2f + 0.15f * Mathf.Abs((playerEndzone.transform.position.z - transform.position.z) / 
-                (opponentEndzone.transform.position.z - playerEndzone.transform.position.z));
+                var target = new Vector3(transform.position.x, 0, player1Zone.transform.position.z);
+                var upperLimit = 1.2f + 0.15f * Mathf.Abs((player1Zone.transform.position.z - transform.position.z) / 
+                (player2Zone.transform.position.z - player1Zone.transform.position.z));
                 force = Random.Range(0.6f, upperLimit) * moveCalculator.Force(target);
                 break;
         }
@@ -94,34 +76,30 @@ public class FootballMovement : MonoBehaviour
     }
 
     void Play(Referee.Player player){
-        if(referee.Kickable(player)){
+        if (referee.playState == Referee.PlayState.Kickoff) {
             Kick(player);
-        } else if(referee.Pushable(player)){
-            Push(player);
+        } else if (referee.playState == Referee.PlayState.Drive) {
+            Drive(player);
         }
+        StartCoroutine(referee.WaitAndUpdateState());
     }
 
-    void Start()
+    void Awake()
     {
         footballBody = GetComponent<Rigidbody>();
-        playerKickoffPosition = new Vector3(
-            playerEndzone.transform.position.x,
+        player1KickoffPosition = new Vector3(
+            player1Zone.transform.position.x,
             transform.position.y,
-            playerEndzone.transform.position.z
+            player1Zone.transform.position.z
         );
-        opponentKickoffPosition = new Vector3(
-            opponentEndzone.transform.position.x,
+        player2KickoffPosition = new Vector3(
+            player2Zone.transform.position.x,
             transform.position.y,
-            opponentEndzone.transform.position.z
+            player2Zone.transform.position.z
         );
         kickoffRotation = transform.rotation;
         cornerOffset = transform.position + flickDisplacement * (transform.up.normalized);
-        if (referee.nPlayers == 2){
-            waitTime = 0;
-        } else {
-            waitTime = 1;
-        }
-        transform.position = playerKickoffPosition;
+        transform.position = player1KickoffPosition;
     }
 
     void Update()
@@ -134,50 +112,27 @@ public class FootballMovement : MonoBehaviour
             } else {
                 Play(Referee.Player.Player2);
             }
-            referee.SetPlayState(Referee.PlayState.Waiting);
-            if (waitRoutine != null) {
-                StopCoroutine(waitRoutine);
-            }
-            waitRoutine = PlayEndAndWait(waitTime);
-            StartCoroutine(waitRoutine);
         }
 
-        if(referee.Playable(Referee.Player.Computer)){
-            referee.SetPlayState(Referee.PlayState.Waiting);
+        if(referee.Playable(Referee.Player.Computer)) {
             Play(Referee.Player.Computer);
-            if (waitRoutine != null) {
-                StopCoroutine(waitRoutine);
-            }
-            waitRoutine = PlayEndAndWait(0);
-            StartCoroutine(waitRoutine);
-        }
-
-        if(referee.OutOfBounds() & referee.InPlay()){
-            referee.SetPlayState(Referee.PlayState.Stopped);
-            StopCoroutine(waitRoutine);
-            StartCoroutine(SetupKickoff(referee.PlayerTurn()));
         }
     }
 
-    bool ScoringPosition(Collider other, Referee.Player player){
-        return (other.CompareTag("PlayerEnd") & (player == Referee.Player.Player2 | player == Referee.Player.Computer)) |
+    bool ScoringPosition(Collider other, Referee.Player player) {
+        return (other.CompareTag("PlayerEnd") & player != Referee.Player.Player1) |
                (other.CompareTag("OppoEnd") & player == Referee.Player.Player1);
     }
 
-    void OnTriggerStay(Collider other){
-        if(ScoringPosition(other, referee.PlayerTurn()) & referee.InPlay()){
-            StopCoroutine(waitRoutine);
-        }
-        if(ScoringPosition(other, referee.PlayerTurn()) & referee.Scoreable()){
-            referee.SetPlayState(Referee.PlayState.Stopped);
-            referee.Touchdown(referee.PlayerTurn());
+    void OnTriggerStay(Collider other) {
+        if (ScoringPosition(other, referee.PlayerTurn()) & !scoringPosition) {
+            scoringPosition = true;
         }
     }
 
-    IEnumerator PlayEndAndWait(float seconds){
-        yield return new WaitUntil(footballBody.IsSleeping);
-        yield return new WaitForSeconds(seconds);
-        referee.ChangeTurn();
-        referee.SetPlayState(Referee.PlayState.Playing);
+    void OnTriggerExit(Collider other) {
+        if (other.CompareTag("PlayerEnd") | other.CompareTag("OppoEnd")) {
+            scoringPosition = false;
+        }
     }
 }

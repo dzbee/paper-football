@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 210197209}
   - component: {fileID: 210197208}
   m_Layer: 0
-  m_Name: PlayerFG
+  m_Name: Player1FG
   m_TagString: PlayerFG
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -414,7 +414,7 @@ GameObject:
   - component: {fileID: 534723705}
   - component: {fileID: 534723704}
   m_Layer: 0
-  m_Name: OpponentFG
+  m_Name: Player2FG
   m_TagString: OppoFG
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -681,7 +681,7 @@ GameObject:
   - component: {fileID: 709092086}
   - component: {fileID: 709092088}
   m_Layer: 0
-  m_Name: PlayerEnd
+  m_Name: Player1End
   m_TagString: PlayerEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,14 +1103,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   referee: {fileID: 1822030577}
-  cameraFollow: {fileID: 1664321684}
   moveCalculator: {fileID: 179149721}
-  playerEndzone: {fileID: 709092082}
-  opponentEndzone: {fileID: 1293204046}
-  playerFG: {fileID: 210197206}
-  opponentFG: {fileID: 534723702}
-  footballFG: {fileID: 1326707093}
+  player1Zone: {fileID: 709092082}
+  player2Zone: {fileID: 1293204046}
   powerSpeed: 1
+  scoringPosition: 0
 --- !u!64 &1027677069
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1137,7 +1134,7 @@ GameObject:
   - component: {fileID: 1293204050}
   - component: {fileID: 1293204049}
   m_Layer: 0
-  m_Name: OpponentEnd
+  m_Name: Player2End
   m_TagString: OppoEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1294,9 +1291,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   referee: {fileID: 1822030577}
-  primaryFootball: {fileID: 0}
   powerSpeed: 1
   flickDisplacement: 0.45
+  scoringPosition: 0
 --- !u!64 &1326707101
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1681,19 +1678,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   football: {fileID: 1027677062}
   footballFG: {fileID: 1326707093}
-  playerFG: {fileID: 210197206}
-  oppoFG: {fileID: 534723702}
+  player1FG: {fileID: 210197206}
+  player2FG: {fileID: 534723702}
   gameOverPanel: {fileID: 619707641}
   movement: {fileID: 1027677068}
+  movementFG: {fileID: 1326707100}
   cameraFollow: {fileID: 1664321684}
   scoreboard: {fileID: 1495102111}
   gameClock: {fileID: 464834287}
-  nPlayers: 1
-  player1Name: Dylan
-  player2Name: Computer
-  gameMode: 0
   gameTime: 0
-  gamePoints: 7
+  playState: 0
 --- !u!4 &1822030578
 Transform:
   m_ObjectHideFlags: 0

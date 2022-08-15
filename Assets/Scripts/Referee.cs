@@ -5,34 +5,22 @@ using TMPro;
 
 public class Referee : MonoBehaviour
 {
-    public GameObject football, footballFG, playerFG, oppoFG;
-    [SerializeField] GameObject gameOverPanel;
-    public FootballMovement movement;
-    public CameraFollow cameraFollow;
-    private Rigidbody footballBody;
+    [SerializeField] GameObject football, footballFG, player1FG, player2FG, gameOverPanel;
+    [SerializeField] FootballMovement movement;
+    [SerializeField] FieldGoalFlick movementFG;
+    [SerializeField] CameraFollow cameraFollow;
+    Rigidbody footballBody;
     [SerializeField] TextMeshProUGUI scoreboard, gameClock;
-    public int nPlayers = 1;
-    public string player1Name, player2Name;
-    [SerializeField] DataManager.GameMode gameMode;
-    [SerializeField] int gameTime, gamePoints;
-    public enum PlayState{Playing, Waiting, Stopped};
-    private PlayState playState = PlayState.Playing;
+    [SerializeField] int gameTime;
+    public enum PlayState{Kickoff, Waiting, Drive, FGAttempt};
+    public PlayState playState;
     public enum Player{Player1, Player2, Computer};
-    private Player turn = Player.Player1;
-    private int player1Score, player2Score = 0;
-    private bool kickoff = true;
-    
-    public void SetPlayState(PlayState state) {
-        playState = state;
-    }
-
-    public bool InPlay(){
-        return playState != PlayState.Stopped;
-    }
+    Player turn = Player.Player1;
+    int player1Score, player2Score = 0;
 
     public void ChangeTurn(){
         if (turn == Player.Player1){
-            if(nPlayers == 2){
+            if(DataManager.Instance.gameParameters.nPlayers == 2){
                 turn = Player.Player2;
             } else {
                 turn = Player.Computer;
@@ -46,30 +34,79 @@ public class Referee : MonoBehaviour
         return turn;
     }
 
-    public bool Pushable(Player player){
-        return !kickoff & turn == player & footballBody.IsSleeping();
-    }
-
-    public bool Kickable(Player player){
-        return kickoff & turn == player & footballBody.IsSleeping();
-    }
-
     public bool Playable(Player player){
-        return playState == PlayState.Playing & (Pushable(player) | Kickable(player));
+        return player == turn & (playState == PlayState.Kickoff | playState == PlayState.Drive);
     }
 
-    public void ReadyForKickoff(bool ready){
-        kickoff = ready;
-    }
-    
-    public bool OutOfBounds(){
-        return football.transform.position.y < 0f;
-    }
-    
-    public bool Scoreable(){
-        return footballBody.IsSleeping() & InPlay();
+    public void ReadyForKickoff(){
+        playState = PlayState.Kickoff;
     }
 
+    bool IsPlayFinished() {
+        return footballBody.IsSleeping() | IsOutOfBounds();
+    }
+
+    float DriveWaitTime() {
+        if (turn == Player.Computer) {
+            return 0.5f;
+        }
+        return 0;
+    }
+
+    void ActivatePrimaryPlay() {
+        player1FG.SetActive(false);
+        player2FG.SetActive(false);
+        footballFG.SetActive(false);
+        footballBody = football.GetComponent<Rigidbody>();
+        cameraFollow.Switch();
+        football.SetActive(true);
+    }
+
+    void ActivateFGPlay() {
+        football.SetActive(false);
+        footballFG.SetActive(true);
+        footballBody = footballFG.GetComponent<Rigidbody>();
+        if (turn == Referee.Player.Player1) {
+            player2FG.SetActive(true);
+        } else {
+            player1FG.SetActive(true);
+        }
+        cameraFollow.Switch();
+        gameObject.SetActive(true);
+        footballBody.Sleep();
+    }
+
+    public IEnumerator WaitAndUpdateState() {
+        playState = PlayState.Waiting;
+        yield return new WaitUntil(IsPlayFinished);
+        if (IsOutOfBounds()) {
+            yield return new WaitForSeconds(0.5f);
+            movement.SetupKickoff(turn);
+            yield break;
+        }
+        if (movement.scoringPosition & football.activeInHierarchy) {
+            Touchdown(turn);
+            yield return new WaitForSeconds(0.5f);
+            ActivateFGPlay();
+            playState = PlayState.FGAttempt;
+            yield break;
+        }
+        if (movementFG.scoringPosition & footballFG.activeInHierarchy) {
+            ExtraPoint(turn);
+            yield return new WaitForSeconds(0.5f);
+            ActivatePrimaryPlay();
+            movement.SetupKickoff(turn);
+            yield break;
+        }
+        ChangeTurn();
+        yield return new WaitForSeconds(DriveWaitTime());
+        playState = PlayState.Drive;
+    }
+
+    public bool IsOutOfBounds(){
+        return footballBody.transform.position.y < 0f;
+    }
+    
     public void Touchdown(Player player){
         if (player == Player.Player1) {
             player1Score += 6;
@@ -77,7 +114,6 @@ public class Referee : MonoBehaviour
             player2Score += 6;
         }
         SetScore();
-        StartCoroutine(movement.SetupFG(player));
     }
 
     public void ExtraPoint(Player player){
@@ -89,25 +125,22 @@ public class Referee : MonoBehaviour
         SetScore();
     }
 
-    public IEnumerator ResetPlay(){
-        StartCoroutine(movement.SetupKickoff(turn));
-        yield return new WaitForSeconds(1);
-        playerFG.SetActive(false);
-        oppoFG.SetActive(false);
-        footballFG.SetActive(false);
-        cameraFollow.Switch();
-        football.SetActive(true);
+    bool IsFinalScore() {
+        return (
+            DataManager.Instance.gameParameters.gameMode == DataManager.GameMode.Points & (
+                player1Score >= DataManager.Instance.gameParameters.pointLimit |
+                player2Score >= DataManager.Instance.gameParameters.pointLimit
+            )
+        );
     }
 
     void SetScore()
     {
         // Check for end of game if points game mode
-        if (gameMode == DataManager.GameMode.Points) {
-            if (player1Score >= gamePoints | player2Score >= gamePoints) {
-                GameOver();
-            }
+        if (IsFinalScore()) {
+            GameOver();
         }
-        scoreboard.text = $"{player1Name}: {player1Score}\n{player2Name}: {player2Score}";
+        scoreboard.text = $"{DataManager.Instance.gameParameters.player1Name}: {player1Score}\n{DataManager.Instance.gameParameters.player2Name}: {player2Score}";
     }
 
     void SetTime() {
@@ -121,7 +154,6 @@ public class Referee : MonoBehaviour
     }
 
     void GameOver() {
-        playState = PlayState.Stopped;
         gameOverPanel.SetActive(true);
         StopAllCoroutines();
         Time.timeScale = 0;
@@ -137,25 +169,23 @@ public class Referee : MonoBehaviour
         StartCoroutine(CountTime());
     }
 
-    void Start(){
-        if (DataManager.Instance != null) {
-            nPlayers = DataManager.Instance.nPlayers;
-            player1Name = DataManager.Instance.player1Name;
-            if (nPlayers > 1) {
-                player2Name = DataManager.Instance.player2Name;
-            } else {
-                player2Name = "Computer";
-            }
-            gameMode = DataManager.Instance.gameMode;
-            gamePoints = DataManager.Instance.gamePoints;
-            gameTime = DataManager.Instance.gameTime;
+    void Awake() {
+        if (DataManager.Instance == null) {
+            DataManager.Instance = new GameObject("DataManager").AddComponent<DataManager>();
+        }
+        if (DataManager.Instance.gameParameters.gameMode == DataManager.GameMode.Time) {
+            gameTime = DataManager.Instance.gameParameters.timeLimit;
         }
         footballBody = football.GetComponent<Rigidbody>();
+    }
+
+    void Start() {
         SetScore();
-        if (gameMode == DataManager.GameMode.Time) {
+        if (DataManager.Instance.gameParameters.gameMode == DataManager.GameMode.Time) {
             SetTime();
             gameClock.gameObject.SetActive(true);
             StartCoroutine(CountTime());
         }
+        movement.SetupKickoff(turn);
     }
 }

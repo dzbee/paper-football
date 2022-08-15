@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class FieldGoalFlick : MonoBehaviour
 {
-    public Referee referee;
-    public FootballMovement primaryFootball;
-    private Rigidbody footballBody;
-    private float force = 0f;
-    public float powerSpeed = 1f;
-    public float flickDisplacement = 0.45f;
-    private bool kicked = false;
-    private bool exited = false;
+    [SerializeField] Referee referee;
+    Rigidbody footballBody;
+    float force = 0f;
+    [SerializeField] float powerSpeed = 1f;
+    [SerializeField] float flickDisplacement = 0.45f;
+    public bool scoringPosition;
     private Vector3 startPosition;
     private Quaternion startRotation;
 
@@ -40,31 +38,24 @@ public class FieldGoalFlick : MonoBehaviour
                 ForceMode.Impulse
             );
         force = 0f;
-        kicked = true;
+        StartCoroutine(referee.WaitAndUpdateState());
     }
 
-    // Start is called before the first frame update
-    void Awake()
-    {
+    void Awake() {
         footballBody = GetComponent<Rigidbody>();
         startPosition = transform.position;
         startRotation = transform.rotation;
     }
 
     void OnEnable(){
-        referee.SetPlayState(Referee.PlayState.Playing);
-        kicked = false;
-        exited = false;
         transform.position = startPosition;
         transform.rotation = startRotation;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetButton("Jump") & !kicked) {
+    void Update() {
+        if (Input.GetButton("Jump") & referee.playState == Referee.PlayState.FGAttempt) {
             force += powerSpeed * Time.deltaTime;
-        } else if (Input.GetButtonUp("Jump") & !kicked) {
+        } else if (Input.GetButtonUp("Jump") & referee.playState == Referee.PlayState.FGAttempt) {
             if (referee.PlayerTurn() == Referee.Player.Player1) {
                 Flick(Referee.Player.Player1);
             } else if (referee.PlayerTurn() == Referee.Player.Player2) {
@@ -72,27 +63,26 @@ public class FieldGoalFlick : MonoBehaviour
             }
         }
 
-        if(referee.PlayerTurn() == Referee.Player.Computer & !kicked){
+        if (referee.PlayerTurn() == Referee.Player.Computer & referee.playState == Referee.PlayState.FGAttempt) {
             Flick(Referee.Player.Computer);
-        }
-
-        if(kicked & (footballBody.IsSleeping() | referee.OutOfBounds()) & !exited){
-            exited = true;
-            StartCoroutine(referee.ResetPlay());
         }
     }
 
     bool ScoringPosition(Collider other, Referee.Player player){
-        return (other.CompareTag("PlayerFG") & (player == Referee.Player.Player2 | player == Referee.Player.Computer)) |
+        return (other.CompareTag("PlayerFG") & player != Referee.Player.Player1) |
                (other.CompareTag("OppoFG") & player == Referee.Player.Player1);
     }
 
     void OnTriggerStay(Collider other){
-        if(ScoringPosition(other, referee.PlayerTurn()) & referee.InPlay()){
-            referee.SetPlayState(Referee.PlayState.Stopped);
-            referee.ExtraPoint(referee.PlayerTurn());
-            footballBody.velocity = Vector3.zero;
+        if(ScoringPosition(other, referee.PlayerTurn())){
+            scoringPosition = true;
             footballBody.Sleep();
+        }
+    }
+
+    void OnTriggerExit(Collider other) {
+        if (other.CompareTag("PlayerFG") | other.CompareTag("OppoFG")) {
+            scoringPosition = false;
         }
     }
 }
