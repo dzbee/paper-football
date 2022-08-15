@@ -19,7 +19,7 @@ public class MenuManager : MonoBehaviour
     }
 
     public void Set1Player() {
-        DataManager.Instance.nPlayers = 1;
+        DataManager.Instance.gameParameters.nPlayers = 1;
         playerSelectorText.text = "1 Player";
         playerIncrementButton.SetActive(true);
         playerDecrementButton.SetActive(false);
@@ -29,7 +29,7 @@ public class MenuManager : MonoBehaviour
     }
 
     public void Set2Player() {
-        DataManager.Instance.nPlayers = 2;
+        DataManager.Instance.gameParameters.nPlayers = 2;
         playerSelectorText.text = "2 Player";
         playerIncrementButton.SetActive(false);
         playerDecrementButton.SetActive(true);
@@ -39,15 +39,15 @@ public class MenuManager : MonoBehaviour
     }
 
     public void SetPlayer1Name(string name) {
-        DataManager.Instance.player1Name = name;
+        DataManager.Instance.gameParameters.player1Name = name;
     }
 
     public void SetPlayer2Name(string name) {
-        DataManager.Instance.player2Name = name;
+        DataManager.Instance.gameParameters.player2Name = name;
     }
 
     public void SetGameTimeMode() {
-        DataManager.Instance.gameMode = DataManager.GameMode.Time;
+        DataManager.Instance.gameParameters.gameMode = DataManager.GameMode.Time;
         gameModeText.text = "Time Limit";
         gameTimeButton.SetActive(false);
         gamePointButton.SetActive(true);
@@ -56,7 +56,7 @@ public class MenuManager : MonoBehaviour
     }
 
     public void SetGamePointMode() {
-        DataManager.Instance.gameMode = DataManager.GameMode.Points;
+        DataManager.Instance.gameParameters.gameMode = DataManager.GameMode.Points;
         gameModeText.text = "Point Limit";
         gameTimeButton.SetActive(true);
         gamePointButton.SetActive(false);
@@ -65,34 +65,34 @@ public class MenuManager : MonoBehaviour
     }
 
     public void IncrementPointLimit() {
-        var newPointLimit = DataManager.Instance.gamePoints + pointLimitIncrement;
+        var newPointLimit = DataManager.Instance.gameParameters.pointLimit + pointLimitIncrement;
         if (newPointLimit <= maxPointLimit) {
-            DataManager.Instance.gamePoints = newPointLimit;
-            gamePointText.text = DataManager.Instance.gamePoints.ToString();
+            DataManager.Instance.gameParameters.pointLimit = newPointLimit;
+            gamePointText.text = DataManager.Instance.gameParameters.pointLimit.ToString();
         }
     }
 
     public void DecrementPointLimit() {
-        var newPointLimit = DataManager.Instance.gamePoints - pointLimitIncrement;
+        var newPointLimit = DataManager.Instance.gameParameters.pointLimit - pointLimitIncrement;
         if (newPointLimit > 0) {
-            DataManager.Instance.gamePoints = newPointLimit;
-            gamePointText.text = DataManager.Instance.gamePoints.ToString();
+            DataManager.Instance.gameParameters.pointLimit = newPointLimit;
+            gamePointText.text = DataManager.Instance.gameParameters.pointLimit.ToString();
         }
     }
 
     public void IncrementTimeLimit() {
-        var newTimeLimit = DataManager.Instance.gameTime + timeLimitIncrement;
+        var newTimeLimit = DataManager.Instance.gameParameters.timeLimit + timeLimitIncrement;
         if (newTimeLimit <= maxTimeLimit) {
-            DataManager.Instance.gameTime = newTimeLimit;
-            gameTimeText.text = TimeToString(DataManager.Instance.gameTime);
+            DataManager.Instance.gameParameters.timeLimit = newTimeLimit;
+            gameTimeText.text = TimeToString(DataManager.Instance.gameParameters.timeLimit);
         }
     }
 
     public void DecrementTimeLimit() {
-        var newTimeLimit = DataManager.Instance.gameTime - timeLimitIncrement;
+        var newTimeLimit = DataManager.Instance.gameParameters.timeLimit - timeLimitIncrement;
         if (newTimeLimit > 0) {
-            DataManager.Instance.gameTime = newTimeLimit;
-            gameTimeText.text = TimeToString(DataManager.Instance.gameTime);
+            DataManager.Instance.gameParameters.timeLimit = newTimeLimit;
+            gameTimeText.text = TimeToString(DataManager.Instance.gameParameters.timeLimit);
         }
     }
 
