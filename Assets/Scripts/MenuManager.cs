@@ -104,4 +104,10 @@ public class MenuManager : MonoBehaviour
         }
         return $"{minutes}:{remainderSeconds}";
     }
+
+    void Awake() {
+        if (DataManager.Instance != null ) {
+            DataManager.Instance.gameParameters = DataManager.GameParameters.GetDefaults();
+        }
+    }
 }
