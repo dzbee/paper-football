@@ -19,7 +19,8 @@ public class DataManager : MonoBehaviour
                 player1Name = "Player",
                 player2Name = "Computer",
                 gameMode = GameMode.Points,
-                pointLimit = 7
+                pointLimit = 7,
+                timeLimit = 3 * 60
             };
         }
     }
