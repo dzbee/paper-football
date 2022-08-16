@@ -15,14 +15,18 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
-        if (followFG) {
+        if (followFG)
+        {
             transform.position = footballFG.transform.position + offset;
-        } else {
+        }
+        else
+        {
             transform.position = football.transform.position + offset;
         }
     }
 
-    public void Switch(){
+    public void Switch()
+    {
         followFG = !followFG;
     }
 }

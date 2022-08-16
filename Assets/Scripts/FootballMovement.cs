@@ -16,11 +16,15 @@ public class FootballMovement : MonoBehaviour
     Vector3 cornerOffset;
     public bool scoringPosition;
 
-    public void SetupKickoff(Referee.Player player) {
-        if(player == Referee.Player.Player1){
+    public void SetupKickoff(Referee.Player player)
+    {
+        if (player == Referee.Player.Player1)
+        {
             transform.position = player1KickoffPosition;
             transform.rotation = kickoffRotation;
-        } else {
+        }
+        else
+        {
             transform.position = player2KickoffPosition;
             transform.rotation = kickoffRotation * Quaternion.Euler(0, 0, 180);
         }
@@ -28,10 +32,12 @@ public class FootballMovement : MonoBehaviour
         referee.ReadyForKickoff();
     }
 
-    void Kick(Referee.Player player){
+    void Kick(Referee.Player player)
+    {
         var position = Vector3.zero;
         var direction = Vector3.zero;
-        switch (player) {
+        switch (player)
+        {
             case Referee.Player.Player1:
                 position = transform.position + cornerOffset;
                 direction = Vector3.up + Vector3.forward;
@@ -39,7 +45,7 @@ public class FootballMovement : MonoBehaviour
             case Referee.Player.Player2:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
-                break;                
+                break;
             case Referee.Player.Computer:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
@@ -54,9 +60,11 @@ public class FootballMovement : MonoBehaviour
         force = 0f;
     }
 
-    void Drive(Referee.Player player){
+    void Drive(Referee.Player player)
+    {
         var direction = Vector3.zero;
-        switch (player) {
+        switch (player)
+        {
             case Referee.Player.Player1:
                 direction = Vector3.forward;
                 break;
@@ -66,7 +74,7 @@ public class FootballMovement : MonoBehaviour
             case Referee.Player.Computer:
                 direction = Vector3.back;
                 var target = new Vector3(transform.position.x, 0, player1Zone.transform.position.z);
-                var upperLimit = 1.2f + 0.15f * Mathf.Abs((player1Zone.transform.position.z - transform.position.z) / 
+                var upperLimit = 1.2f + 0.15f * Mathf.Abs((player1Zone.transform.position.z - transform.position.z) /
                 (player2Zone.transform.position.z - player1Zone.transform.position.z));
                 force = Random.Range(0.6f, upperLimit) * moveCalculator.Force(target);
                 break;
@@ -75,10 +83,14 @@ public class FootballMovement : MonoBehaviour
         force = 0f;
     }
 
-    void Play(Referee.Player player){
-        if (referee.playState == Referee.PlayState.Kickoff) {
+    void Play(Referee.Player player)
+    {
+        if (referee.playState == Referee.PlayState.Kickoff)
+        {
             Kick(player);
-        } else if (referee.playState == Referee.PlayState.Drive) {
+        }
+        else if (referee.playState == Referee.PlayState.Drive)
+        {
             Drive(player);
         }
         StartCoroutine(referee.WaitAndUpdateState());
@@ -104,34 +116,46 @@ public class FootballMovement : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetButton("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2))) {
+        if (Input.GetButton("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2)))
+        {
             force += powerSpeed * Time.deltaTime;
-        } else if (Input.GetButtonUp("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2))){
-            if (referee.Playable(Referee.Player.Player1)) {
+        }
+        else if (Input.GetButtonUp("Jump") & (referee.Playable(Referee.Player.Player1) | referee.Playable(Referee.Player.Player2)))
+        {
+            if (referee.Playable(Referee.Player.Player1))
+            {
                 Play(Referee.Player.Player1);
-            } else {
+            }
+            else
+            {
                 Play(Referee.Player.Player2);
             }
         }
 
-        if(referee.Playable(Referee.Player.Computer)) {
+        if (referee.Playable(Referee.Player.Computer))
+        {
             Play(Referee.Player.Computer);
         }
     }
 
-    bool ScoringPosition(Collider other, Referee.Player player) {
+    bool ScoringPosition(Collider other, Referee.Player player)
+    {
         return (other.CompareTag("PlayerEnd") & player != Referee.Player.Player1) |
                (other.CompareTag("OppoEnd") & player == Referee.Player.Player1);
     }
 
-    void OnTriggerStay(Collider other) {
-        if (ScoringPosition(other, referee.PlayerTurn()) & !scoringPosition) {
+    void OnTriggerStay(Collider other)
+    {
+        if (ScoringPosition(other, referee.PlayerTurn()) & !scoringPosition)
+        {
             scoringPosition = true;
         }
     }
 
-    void OnTriggerExit(Collider other) {
-        if (other.CompareTag("PlayerEnd") | other.CompareTag("OppoEnd")) {
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("PlayerEnd") | other.CompareTag("OppoEnd"))
+        {
             scoringPosition = false;
         }
     }

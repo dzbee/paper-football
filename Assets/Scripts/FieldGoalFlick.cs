@@ -13,11 +13,13 @@ public class FieldGoalFlick : MonoBehaviour
     private Vector3 startPosition;
     private Quaternion startRotation;
 
-    void Flick(Referee.Player player){
+    void Flick(Referee.Player player)
+    {
         var cornerOffset = flickDisplacement * Vector3.down;
         var position = Vector3.zero;
         var direction = Vector3.zero;
-        switch (player) {
+        switch (player)
+        {
             case Referee.Player.Player1:
                 position = transform.position + cornerOffset;
                 direction = Vector3.up + Vector3.forward;
@@ -25,7 +27,7 @@ public class FieldGoalFlick : MonoBehaviour
             case Referee.Player.Player2:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
-                break;                
+                break;
             case Referee.Player.Computer:
                 position = transform.position - cornerOffset;
                 direction = Vector3.up + Vector3.back;
@@ -41,47 +43,62 @@ public class FieldGoalFlick : MonoBehaviour
         StartCoroutine(referee.WaitAndUpdateState());
     }
 
-    void Awake() {
+    void Awake()
+    {
         footballBody = GetComponent<Rigidbody>();
         startPosition = transform.position;
         startRotation = transform.rotation;
     }
 
-    void OnEnable(){
+    void OnEnable()
+    {
         transform.position = startPosition;
         transform.rotation = startRotation;
     }
 
-    void Update() {
-        if (Input.GetButton("Jump") & referee.playState == Referee.PlayState.FGAttempt) {
+    void Update()
+    {
+        if (Input.GetButton("Jump") & referee.playState == Referee.PlayState.FGAttempt)
+        {
             force += powerSpeed * Time.deltaTime;
-        } else if (Input.GetButtonUp("Jump") & referee.playState == Referee.PlayState.FGAttempt) {
-            if (referee.PlayerTurn() == Referee.Player.Player1) {
+        }
+        else if (Input.GetButtonUp("Jump") & referee.playState == Referee.PlayState.FGAttempt)
+        {
+            if (referee.PlayerTurn() == Referee.Player.Player1)
+            {
                 Flick(Referee.Player.Player1);
-            } else if (referee.PlayerTurn() == Referee.Player.Player2) {
+            }
+            else if (referee.PlayerTurn() == Referee.Player.Player2)
+            {
                 Flick(Referee.Player.Player2);
             }
         }
 
-        if (referee.PlayerTurn() == Referee.Player.Computer & referee.playState == Referee.PlayState.FGAttempt) {
+        if (referee.PlayerTurn() == Referee.Player.Computer & referee.playState == Referee.PlayState.FGAttempt)
+        {
             Flick(Referee.Player.Computer);
         }
     }
 
-    bool ScoringPosition(Collider other, Referee.Player player){
+    bool ScoringPosition(Collider other, Referee.Player player)
+    {
         return (other.CompareTag("PlayerFG") & player != Referee.Player.Player1) |
                (other.CompareTag("OppoFG") & player == Referee.Player.Player1);
     }
 
-    void OnTriggerStay(Collider other){
-        if(ScoringPosition(other, referee.PlayerTurn())){
+    void OnTriggerStay(Collider other)
+    {
+        if (ScoringPosition(other, referee.PlayerTurn()))
+        {
             scoringPosition = true;
             footballBody.Sleep();
         }
     }
 
-    void OnTriggerExit(Collider other) {
-        if (other.CompareTag("PlayerFG") | other.CompareTag("OppoFG")) {
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("PlayerFG") | other.CompareTag("OppoFG"))
+        {
             scoringPosition = false;
         }
     }

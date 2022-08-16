@@ -5,14 +5,17 @@ using UnityEngine;
 public class CameraSwitch : MonoBehaviour
 {
     public GameObject overheadCamera, tableCamera;
-    
-    void Start() {
+
+    void Start()
+    {
         overheadCamera.SetActive(true);
         tableCamera.SetActive(false);
     }
 
-    void Update() {
-        if(Input.GetButtonDown("Swap")){
+    void Update()
+    {
+        if (Input.GetButtonDown("Swap"))
+        {
             overheadCamera.SetActive(!overheadCamera.activeInHierarchy);
             tableCamera.SetActive(!tableCamera.activeInHierarchy);
         }

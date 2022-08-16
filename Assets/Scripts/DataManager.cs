@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    public enum GameMode{Points, Time};
+    public enum GameMode { Points, Time };
 
     [System.Serializable]
-    public class GameParameters {
+    public class GameParameters
+    {
         public int nPlayers;
         public string player1Name, player2Name;
         public GameMode gameMode;
         public int pointLimit, timeLimit;
 
-        public static GameParameters GetDefaults() {
-            return new GameParameters() {
+        public static GameParameters GetDefaults()
+        {
+            return new GameParameters()
+            {
                 nPlayers = 1,
                 player1Name = "Player",
                 player2Name = "Computer",
@@ -28,8 +31,10 @@ public class DataManager : MonoBehaviour
     public static DataManager Instance;
     public GameParameters gameParameters;
 
-    void Awake() {
-        if (Instance != null) {
+    void Awake()
+    {
+        if (Instance != null)
+        {
             Destroy(gameObject);
             return;
         }
@@ -38,7 +43,8 @@ public class DataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public DataManager() {
+    public DataManager()
+    {
         gameParameters = GameParameters.GetDefaults();
     }
 }

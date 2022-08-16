@@ -7,7 +7,8 @@ public class MoveCalculator : MonoBehaviour
     public GameObject football;
     public GameObject table;
 
-    public float Force(Vector3 target) {
+    public float Force(Vector3 target)
+    {
         var distance = (target - football.transform.position).magnitude;
         var mass = football.GetComponent<Rigidbody>().mass;
         var footballFriction = football.GetComponent<Collider>().material.dynamicFriction;

@@ -14,11 +14,13 @@ public class MenuManager : MonoBehaviour
     int pointLimitIncrement = 7, maxPointLimit = 70;
     int timeLimitIncrement = 30, maxTimeLimit = 3600;
 
-    public void StartGame() {
+    public void StartGame()
+    {
         SceneManager.LoadScene("Game");
     }
 
-    public void Set1Player() {
+    public void Set1Player()
+    {
         DataManager.Instance.gameParameters.nPlayers = 1;
         playerSelectorText.text = "1 Player";
         playerIncrementButton.SetActive(true);
@@ -28,7 +30,8 @@ public class MenuManager : MonoBehaviour
         player1NameField.transform.position = player1NameFieldPos + 90 * Vector3.right;
     }
 
-    public void Set2Player() {
+    public void Set2Player()
+    {
         DataManager.Instance.gameParameters.nPlayers = 2;
         playerSelectorText.text = "2 Player";
         playerIncrementButton.SetActive(false);
@@ -38,15 +41,18 @@ public class MenuManager : MonoBehaviour
         player2NameField.SetActive(true);
     }
 
-    public void SetPlayer1Name(string name) {
+    public void SetPlayer1Name(string name)
+    {
         DataManager.Instance.gameParameters.player1Name = name;
     }
 
-    public void SetPlayer2Name(string name) {
+    public void SetPlayer2Name(string name)
+    {
         DataManager.Instance.gameParameters.player2Name = name;
     }
 
-    public void SetGameTimeMode() {
+    public void SetGameTimeMode()
+    {
         DataManager.Instance.gameParameters.gameMode = DataManager.GameMode.Time;
         gameModeText.text = "Time Limit";
         gameTimeButton.SetActive(false);
@@ -55,7 +61,8 @@ public class MenuManager : MonoBehaviour
         gamePointSelect.SetActive(false);
     }
 
-    public void SetGamePointMode() {
+    public void SetGamePointMode()
+    {
         DataManager.Instance.gameParameters.gameMode = DataManager.GameMode.Points;
         gameModeText.text = "Point Limit";
         gameTimeButton.SetActive(true);
@@ -64,49 +71,61 @@ public class MenuManager : MonoBehaviour
         gamePointSelect.SetActive(true);
     }
 
-    public void IncrementPointLimit() {
+    public void IncrementPointLimit()
+    {
         var newPointLimit = DataManager.Instance.gameParameters.pointLimit + pointLimitIncrement;
-        if (newPointLimit <= maxPointLimit) {
+        if (newPointLimit <= maxPointLimit)
+        {
             DataManager.Instance.gameParameters.pointLimit = newPointLimit;
             gamePointText.text = DataManager.Instance.gameParameters.pointLimit.ToString();
         }
     }
 
-    public void DecrementPointLimit() {
+    public void DecrementPointLimit()
+    {
         var newPointLimit = DataManager.Instance.gameParameters.pointLimit - pointLimitIncrement;
-        if (newPointLimit > 0) {
+        if (newPointLimit > 0)
+        {
             DataManager.Instance.gameParameters.pointLimit = newPointLimit;
             gamePointText.text = DataManager.Instance.gameParameters.pointLimit.ToString();
         }
     }
 
-    public void IncrementTimeLimit() {
+    public void IncrementTimeLimit()
+    {
         var newTimeLimit = DataManager.Instance.gameParameters.timeLimit + timeLimitIncrement;
-        if (newTimeLimit <= maxTimeLimit) {
+        if (newTimeLimit <= maxTimeLimit)
+        {
             DataManager.Instance.gameParameters.timeLimit = newTimeLimit;
             gameTimeText.text = TimeToString(DataManager.Instance.gameParameters.timeLimit);
         }
     }
 
-    public void DecrementTimeLimit() {
+    public void DecrementTimeLimit()
+    {
         var newTimeLimit = DataManager.Instance.gameParameters.timeLimit - timeLimitIncrement;
-        if (newTimeLimit > 0) {
+        if (newTimeLimit > 0)
+        {
             DataManager.Instance.gameParameters.timeLimit = newTimeLimit;
             gameTimeText.text = TimeToString(DataManager.Instance.gameParameters.timeLimit);
         }
     }
 
-    string TimeToString(int seconds) {
+    string TimeToString(int seconds)
+    {
         int minutes = seconds / 60;
         int remainderSeconds = seconds % 60;
-        if (remainderSeconds < 10) {
+        if (remainderSeconds < 10)
+        {
             return $"{minutes}:0{remainderSeconds}";
         }
         return $"{minutes}:{remainderSeconds}";
     }
 
-    void Awake() {
-        if (DataManager.Instance != null ) {
+    void Awake()
+    {
+        if (DataManager.Instance != null)
+        {
             DataManager.Instance.gameParameters = DataManager.GameParameters.GetDefaults();
         }
     }
