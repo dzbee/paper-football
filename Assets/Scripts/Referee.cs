@@ -8,7 +8,6 @@ public class Referee : MonoBehaviour
     [SerializeField] GameObject football, footballFG, player1FG, player2FG, gameOverPanel;
     [SerializeField] FootballMovement movement;
     [SerializeField] FieldGoalFlick movementFG;
-    [SerializeField] CameraFollow cameraFollow;
     Rigidbody footballBody;
     [SerializeField] TextMeshProUGUI scoreboard, gameClock;
     [SerializeField] int gameTime;
@@ -67,7 +66,6 @@ public class Referee : MonoBehaviour
         player2FG.SetActive(false);
         footballFG.SetActive(false);
         footballBody = football.GetComponent<Rigidbody>();
-        cameraFollow.Switch();
         football.SetActive(true);
     }
 
@@ -84,7 +82,6 @@ public class Referee : MonoBehaviour
         {
             player1FG.SetActive(true);
         }
-        cameraFollow.Switch();
         gameObject.SetActive(true);
         footballBody.Sleep();
     }
