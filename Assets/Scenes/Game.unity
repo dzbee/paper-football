@@ -755,6 +755,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overheadCamera: {fileID: 963194225}
   tableCamera: {fileID: 1664321680}
+  rotateTime: 0.5
 --- !u!4 &841878121
 Transform:
   m_ObjectHideFlags: 0
