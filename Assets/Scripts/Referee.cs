@@ -47,11 +47,6 @@ public class Referee : MonoBehaviour
         return player == turn & (playState == PlayState.Kickoff | playState == PlayState.Drive);
     }
 
-    public void ReadyForKickoff()
-    {
-        playState = PlayState.Kickoff;
-    }
-
     bool IsPlayFinished()
     {
         return footballBody.IsSleeping() | IsOutOfBounds();
@@ -102,6 +97,8 @@ public class Referee : MonoBehaviour
         {
             yield return new WaitForSeconds(0.5f);
             movement.SetupKickoff(turn);
+            yield return new WaitForSeconds(DriveWaitTime());
+            playState = PlayState.Kickoff;
             yield break;
         }
         if (movement.scoringPosition & football.activeInHierarchy)
@@ -109,6 +106,8 @@ public class Referee : MonoBehaviour
             Touchdown(turn);
             yield return new WaitForSeconds(0.5f);
             ActivateFGPlay();
+            // the following line causes an indefinite wait?
+            //yield return new WaitForSeconds(DriveWaitTime());
             playState = PlayState.FGAttempt;
             yield break;
         }

@@ -29,7 +29,6 @@ public class FootballMovement : MonoBehaviour
             transform.rotation = kickoffRotation * Quaternion.Euler(0, 0, 180);
         }
         footballBody.Sleep();
-        referee.ReadyForKickoff();
     }
 
     void Kick(Referee.Player player)
