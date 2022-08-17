@@ -1695,7 +1695,6 @@ GameObject:
   - component: {fileID: 1664321683}
   - component: {fileID: 1664321682}
   - component: {fileID: 1664321681}
-  - component: {fileID: 1664321684}
   m_Layer: 0
   m_Name: Table Camera
   m_TagString: Untagged
@@ -1769,20 +1768,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
---- !u!114 &1664321684
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1664321680}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a0d4259d3fa9b44aba7b1f63892ab7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  football: {fileID: 1027677062}
-  footballFG: {fileID: 1326707093}
 --- !u!1 &1822030576
 GameObject:
   m_ObjectHideFlags: 0
@@ -1819,7 +1804,6 @@ MonoBehaviour:
   gameOverPanel: {fileID: 619707641}
   movement: {fileID: 1027677068}
   movementFG: {fileID: 1326707100}
-  cameraFollow: {fileID: 1664321684}
   scoreboard: {fileID: 1495102111}
   gameClock: {fileID: 464834287}
   gameTime: 0
